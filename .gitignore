@@ -1,4 +1,6 @@
 data
 __pycache__
 tiny-imagenet-200
-*.model
+*.pt
+run
+weights
