@@ -361,14 +361,14 @@ if __name__ == "__main__":
                         '_' + str(epoch + 1) + '.pt'
             torch.save(model.state_dict(), os.path.join(args.save_loc, save_name))
 
-    with open(os.path.join(run_name, save_name[:save_name.rfind('_')] + '_train_loss.json'), 'a') as f:
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_train_loss.json'), 'a') as f:
         json.dump(training_set_loss, f)
 
-    with open(os.path.join(run_name, save_name[:save_name.rfind('_')] + '_val_loss.json'), 'a') as fv:
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_val_loss.json'), 'a') as fv:
         json.dump(val_set_loss, fv)
 
-    with open(os.path.join(run_name, save_name[:save_name.rfind('_')] + '_test_loss.json'), 'a') as ft:
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_test_loss.json'), 'a') as ft:
         json.dump(test_set_loss, ft)
 
-    with open(os.path.join(run_name, save_name[:save_name.rfind('_')] + '_val_error.json'), 'a') as ft:
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_val_error.json'), 'a') as ft:
         json.dump(val_set_err, ft)
