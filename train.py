@@ -343,8 +343,7 @@ if __name__ == "__main__":
         if PF_steps >= args.PF_patience and PF_round <= 3:
             if args.PF_patience != 0:
                 PF_round = PF_fix(model, PF_round)
-                PF_steps = 0
-                best_loss = torch.inf
+                best_val_loss = np.inf
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
