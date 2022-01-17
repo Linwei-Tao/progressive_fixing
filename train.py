@@ -322,9 +322,7 @@ if __name__ == "__main__":
                                       loss_function=args.loss_function,
                                       gamma=gamma,
                                       lamda=args.lamda)
-
-        print('======> Val set loss: {:.4f}'.format(val_loss))
-        print('======> Test set loss: {:.4f}'.format(test_loss))
+        print('====> Epoch: {} Training loss: {:.4f}  Val set loss: {:.4f} Test set loss: {:.4f}'.format(epoch, train_loss, val_loss, test_loss))
 
         scheduler.step()
 
@@ -345,6 +343,7 @@ if __name__ == "__main__":
         if PF_steps >= args.PF_patience and PF_round <= 3:
             if args.PF_patience != 0:
                 PF_round = PF_fix(model, PF_round)
+                PF_steps = 0
                 best_loss = torch.inf
 
         if val_acc > best_val_acc:
