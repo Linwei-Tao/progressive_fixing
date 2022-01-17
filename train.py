@@ -199,13 +199,11 @@ if __name__ == "__main__":
     args.save_loc = os.path.join(args.save_loc, run_name)
     os.mkdir(args.save_loc)
 
-
     cuda = False
     if (torch.cuda.is_available() and args.gpu):
         cuda = True
     device = torch.device("cuda" if cuda else "cpu")
     print("CUDA set: " + str(cuda))
-
 
     num_classes = dataset_num_classes[args.dataset]
 
@@ -322,11 +320,14 @@ if __name__ == "__main__":
                                       loss_function=args.loss_function,
                                       gamma=gamma,
                                       lamda=args.lamda)
-        print('====> Epoch: {} Training loss: {:.4f}  Val set loss: {:.4f} Test set loss: {:.4f}'.format(epoch, train_loss, val_loss, test_loss))
 
         scheduler.step()
 
         _, val_acc, _, _, _ = test_classification_net(model, val_loader, device)
+
+        print(
+            '====> Epoch: {} Training loss: {:.4f}  Val set loss: {:.4f} Val set acc: {:.4f}'.format(epoch, train_loss,
+                                                                                                     val_loss, val_acc))
 
         training_set_loss[epoch] = train_loss
         val_set_loss[epoch] = val_loss
