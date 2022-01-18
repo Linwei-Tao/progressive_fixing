@@ -92,7 +92,7 @@ def parseArgs():
     gamma2 = 1.0
     gamma3 = 1.0
     lamda = 1.0
-    weight_decay = 5e-4
+    weight_decay = 1e-4
     save_interval = 50
     save_loc = 'run'
     model_name = "resnet50"
@@ -103,9 +103,11 @@ def parseArgs():
     second_milestone = 250  # Milestone for change in lr
     gamma_schedule_step1 = 100
     gamma_schedule_step2 = 250
+    PF_epoch_1 = 46
+    PF_epoch_2 = 139
 
     # PF
-    PF_patience = 0  # 0 for no progressively fixing
+    PF_patience = None  # 0 for no progressively fixing
 
     parser = argparse.ArgumentParser(
         description="Training for calibration.",
@@ -183,6 +185,12 @@ def parseArgs():
     # PF
     parser.add_argument("--PF_patience", type=int, default=PF_patience,
                         dest="PF_patience", help="Patience for progressively fixing")
+    parser.add_argument("--force_PF", action="store_true", dest="force_PF",
+                        help="force model to fix layers at certain epochs")
+    parser.add_argument("--PF_epoch_1", type=int, default=PF_epoch_1,
+                        dest="PF_epoch_1", help="Patience for progressively fixing")
+    parser.add_argument("--PF_epoch_2", type=int, default=PF_epoch_2,
+                        dest="PF_epoch_2", help="Patience for progressively fixing")
 
     return parser.parse_args()
 
@@ -192,12 +200,27 @@ if __name__ == "__main__":
     torch.manual_seed(1)
     args = parseArgs()
 
-    run_name = f'{args.model_name}_' \
-               f'{args.dataset}_' \
-               f'{args.loss_function}_' \
-               f'PF={args.PF_patience}_' \
-               f'WD={args.weight_decay}_' \
-               f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+    if args.PF_patience:
+        run_name = f'{args.model_name}_' \
+                   f'{args.dataset}_' \
+                   f'{args.loss_function}_' \
+                   f'PF={args.PF_patience}_' \
+                   f'WD={args.weight_decay}_' \
+                   f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+    elif args.force_PF:
+        run_name = f'{args.model_name}_' \
+                   f'{args.dataset}_' \
+                   f'{args.loss_function}_' \
+                   f'PF_1={args.PF_epoch_1}_' \
+                   f'PF_2={args.PF_epoch_2}_' \
+                   f'WD={args.weight_decay}_' \
+                   f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+    else:
+        run_name = f'{args.model_name}_' \
+                   f'{args.dataset}_' \
+                   f'{args.loss_function}_' \
+                   f'WD={args.weight_decay}_' \
+                   f'{datetime.now().strftime("%y%m%d%H%M%S")}'
 
     args.save_loc = os.path.join(args.save_loc, run_name)
     os.mkdir(args.save_loc)
@@ -337,18 +360,23 @@ if __name__ == "__main__":
         test_set_loss[epoch] = test_loss
         val_set_err[epoch] = 1 - val_acc
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            PF_steps = 0
+        if args.PF_patience:
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                PF_steps = 0
 
-        if val_loss > best_val_loss:
-            PF_steps += 1
+            if val_loss > best_val_loss:
+                PF_steps += 1
 
-        if PF_steps >= args.PF_patience and PF_round <= 3:
-            if args.PF_patience != 0:
+            if PF_steps >= args.PF_patience and PF_round <= 3:
+                if args.PF_patience != 0:
+                    PF_round = PF_fix(model, PF_round)
+                    best_val_loss = np.inf
+        if args.force_PF:
+            if epoch + 1 == args.PF_epoch_1:
                 PF_round = PF_fix(model, PF_round)
-                best_val_loss = np.inf
-
+            if epoch + 1 == args.PF_epoch_2:
+                PF_round = PF_fix(model, PF_round)
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             model.best_epoch = epoch + 1
