@@ -18,7 +18,7 @@ import Data.cifar100 as cifar100
 import Data.tiny_imagenet as tiny_imagenet
 
 # Import network models
-from Net.resnet import resnet50, resnet110
+from Net.resnet import resnet18, resnet34, resnet50, resnet110
 from Net.resnet_tiny_imagenet import resnet50 as resnet50_ti
 from Net.wide_resnet import wide_resnet_cifar
 from Net.densenet import densenet121
@@ -47,6 +47,8 @@ dataset_loader = {
 }
 
 models = {
+    'resnet18': resnet18,
+    'resnet34': resnet34,
     'resnet50': resnet50,
     'resnet50_ti': resnet50_ti,
     'resnet110': resnet110,
@@ -194,6 +196,7 @@ if __name__ == "__main__":
                f'{args.dataset}_' \
                f'{args.loss_function}_' \
                f'PF={args.PF_patience}_' \
+               f'WD={args.weight_decay}_' \
                f'{datetime.now().strftime("%y%m%d%H%M%S")}'
 
     args.save_loc = os.path.join(args.save_loc, run_name)
@@ -349,7 +352,6 @@ if __name__ == "__main__":
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             model.best_epoch = epoch + 1
-            print('New best error: %.4f' % (1 - best_val_acc))
             save_name = loss_function_save_name(args.loss_function, args.gamma_schedule, gamma, args.gamma, args.gamma2,
                                                 args.gamma3, args.lamda) + '_best.pt'
             torch.save(model.state_dict(), os.path.join(args.save_loc, save_name))
