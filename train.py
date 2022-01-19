@@ -311,6 +311,7 @@ if __name__ == "__main__":
     val_set_loss = {}
     test_set_loss = {}
     val_set_err = {}
+    val_set_ece = {}
 
     for epoch in range(0, start_epoch):
         scheduler.step()
@@ -367,6 +368,7 @@ if __name__ == "__main__":
         val_set_loss[epoch] = val_loss
         test_set_loss[epoch] = test_loss
         val_set_err[epoch] = 1 - val_acc
+        val_set_ece[epoch] = ece
 
         if args.PF_patience:
             if val_loss < best_val_loss:
@@ -409,3 +411,6 @@ if __name__ == "__main__":
 
     with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_val_error.json'), 'a') as ft:
         json.dump(val_set_err, ft)
+
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_val_ece.json'), 'a') as ft:
+        json.dump(val_set_ece, ft)
