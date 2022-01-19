@@ -3,4 +3,3 @@ __pycache__
 tiny-imagenet-200
 *.pt
 weights
-/HPC/
