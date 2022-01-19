@@ -97,9 +97,10 @@ def test_single_epoch(epoch,
     return loss / num_samples
 
 
-def PF_fix(model, PF_round):
+def PF_fix(model, PF_round, epoch):
     PF_round = PF_round + 1
     print(f"PF_fix round {PF_round}")
+    model.fixAt.append(epoch)
 
     for i in range(PF_round):
         print(f'fix {model.blocks_name[-(i+1)]} parameters')

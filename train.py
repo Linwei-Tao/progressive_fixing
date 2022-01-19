@@ -196,8 +196,14 @@ def parseArgs():
 
 
 if __name__ == "__main__":
+    def setup_seed(seed):
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+        torch.backends.cudnn.deterministic = True
 
-    torch.manual_seed(1)
+    setup_seed(20)
     args = parseArgs()
 
     if args.PF_patience:
@@ -221,6 +227,8 @@ if __name__ == "__main__":
                    f'{args.loss_function}_' \
                    f'WD={args.weight_decay}_' \
                    f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+
+    print(run_name)
 
     args.save_loc = os.path.join(args.save_loc, run_name)
     os.mkdir(args.save_loc)
@@ -370,13 +378,13 @@ if __name__ == "__main__":
 
             if PF_steps >= args.PF_patience and PF_round <= 3:
                 if args.PF_patience != 0:
-                    PF_round = PF_fix(model, PF_round)
+                    PF_round = PF_fix(model, PF_round, epoch)
                     best_val_loss = np.inf
         if args.force_PF:
             if epoch + 1 == args.PF_epoch_1:
-                PF_round = PF_fix(model, PF_round)
+                PF_round = PF_fix(model, PF_round, epoch)
             if epoch + 1 == args.PF_epoch_2:
-                PF_round = PF_fix(model, PF_round)
+                PF_round = PF_fix(model, PF_round, epoch)
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             model.best_epoch = epoch + 1
