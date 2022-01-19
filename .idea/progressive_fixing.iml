@@ -5,6 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/run" />
       <excludeFolder url="file://$MODULE_DIR$/weights" />
       <excludeFolder url="file://$MODULE_DIR$/data" />
+      <excludeFolder url="file://$MODULE_DIR$/Experiments/data" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (progressive_fixing) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -1,0 +1,20 @@
+FileNotFoundError: [Errno 2] No such file or directory: '/home/ltao0358/pytorch/bin/python'
+Traceback (most recent call last):
+  File "/home/ltao0358/pytorch/bin/pip", line 5, in <module>
+    from pip._internal.cli.main import main
+  File "/home/ltao0358/pytorch/lib/python3.7/site-packages/pip/_internal/cli/main.py", line 9, in <module>
+    from pip._internal.cli.autocompletion import autocomplete
+  File "/home/ltao0358/pytorch/lib/python3.7/site-packages/pip/_internal/cli/autocompletion.py", line 10, in <module>
+    from pip._internal.cli.main_parser import create_main_parser
+  File "/home/ltao0358/pytorch/lib/python3.7/site-packages/pip/_internal/cli/main_parser.py", line 8, in <module>
+  File "/home/ltao0358/pytorch/lib/python3.7/site-packages/pip/_internal/cli/cmdoptions.py", line 21, in <module>
+ModuleNotFoundError: No module named 'pip._vendor.packaging'
+Processing /usr/local/pytorch/cuda10.2/torchvision-0.7.0a0+3d65fc6-cp37-cp37m-linux_x86_64.whl
+Requirement already satisfied: torch in ./pytorch/lib/python3.7/site-packages (from torchvision==0.7.0a0+3d65fc6) (1.6.0a0+f41742f)
+Requirement already satisfied: numpy in /usr/local/python/3.7.7/lib/python3.7/site-packages/numpy-1.18.2-py3.7-linux-x86_64.egg (from torchvision==0.7.0a0+3d65fc6) (1.18.2)
+Requirement already satisfied: pillow>=4.1.1 in /usr/local/python/3.7.7/lib/python3.7/site-packages (from torchvision==0.7.0a0+3d65fc6) (7.1.2)
+Requirement already satisfied: future in /usr/local/python/3.7.7/lib/python3.7/site-packages (from torch->torchvision==0.7.0a0+3d65fc6) (0.18.2)
+torchvision is already installed with the same version as the provided wheel. Use --force-reinstall to force an installation of the wheel.
+Processing /tmp/build/80754af9/joblib_1635411271373/work
+ERROR: Could not install packages due to an OSError: [Errno 2] No such file or directory: '/tmp/build/80754af9/joblib_1635411271373/work'
+

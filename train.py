@@ -357,11 +357,11 @@ if __name__ == "__main__":
 
         scheduler.step()
 
-        _, val_acc, _, _, _ = test_classification_net(model, val_loader, device)
+        _, val_acc, _, _, _, ece = test_classification_net(model, val_loader, device)
 
         print(
-            '====> Epoch: {} Training loss: {:.4f}  Val set loss: {:.4f} Val set acc: {:.4f}'.format(epoch, train_loss,
-                                                                                                     val_loss, val_acc))
+            '====> Epoch: {} Training loss: {:.4f}  Val set loss: {:.4f} Val set acc: {:.4f} Val ECE: {:.4f}'.format(epoch, train_loss,
+                                                                                                     val_loss, val_acc, ece))
 
         training_set_loss[epoch] = train_loss
         val_set_loss[epoch] = val_loss

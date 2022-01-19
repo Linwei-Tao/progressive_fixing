@@ -139,8 +139,10 @@ def test_classification_net(model, data_loader, device):
     '''
     model.eval()
     labels_list = []
+    logits_list = []
     predictions_list = []
     confidence_vals_list = []
+    ece_criterion = ECELoss()
     with torch.no_grad():
         for i, (data, label) in enumerate(data_loader):
             data = data.to(device)
@@ -150,13 +152,14 @@ def test_classification_net(model, data_loader, device):
             softmax = F.softmax(logits, dim=1)
             confidence_vals, predictions = torch.max(softmax, dim=1)
 
+            logits_list.extend(softmax.cpu().numpy().tolist())
             labels_list.extend(label.cpu().numpy().tolist())
             predictions_list.extend(predictions.cpu().numpy().tolist())
             confidence_vals_list.extend(confidence_vals.cpu().numpy().tolist())
     accuracy = accuracy_score(labels_list, predictions_list)
-
+    ece = ece_criterion(torch.tensor(logits_list), torch.tensor(labels_list)).item()
     return confusion_matrix(labels_list, predictions_list), accuracy, labels_list,\
-        predictions_list, confidence_vals_list
+        predictions_list, confidence_vals_list, ece
 
 
 # Calibration error scores in the form of loss metrics

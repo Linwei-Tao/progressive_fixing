@@ -1,0 +1,30 @@
+RuntimeError: failed to build image pip because:
+Traceback (most recent call last):
+  File "/usr/local/python/3.7.7/lib/python3.7/site-packages/virtualenv/seed/embed/via_app_data/via_app_data.py", line 57, in _install
+    installer.install(creator.interpreter.version_info)
+  File "/usr/local/python/3.7.7/lib/python3.7/site-packages/virtualenv/seed/embed/via_app_data/pip_install/base.py", line 42, in install
+    self._sync(filename, into)
+  File "/usr/local/python/3.7.7/lib/python3.7/site-packages/virtualenv/seed/embed/via_app_data/pip_install/copy.py", line 13, in _sync
+    copy(src, dst)
+  File "/usr/local/python/3.7.7/lib/python3.7/site-packages/virtualenv/util/path/_sync.py", line 53, in copy
+    method(norm(src), norm(dest))
+  File "/usr/local/python/3.7.7/lib/python3.7/site-packages/virtualenv/util/path/_sync.py", line 60, in copytree
+    os.makedirs(dest_dir)
+  File "/usr/local/python/3.7.7/lib/python3.7/os.py", line 223, in makedirs
+    mkdir(name, mode)
+FileExistsError: [Errno 17] File exists: '/home/ltao0358/pytorch/lib/python3.7/site-packages/pip/.'
+
+Traceback (most recent call last):
+  File "/home/ltao0358/pytorch/bin/pip", line 5, in <module>
+    from pip._internal.cli.main import main
+ModuleNotFoundError: No module named 'pip._internal'
+Traceback (most recent call last):
+  File "/home/ltao0358/pytorch/bin/pip", line 5, in <module>
+    from pip._internal.cli.main import main
+ModuleNotFoundError: No module named 'pip._internal'
+Traceback (most recent call last):
+  File "/home/ltao0358/pytorch/bin/pip", line 5, in <module>
+    from pip._internal.cli.main import main
+  File "/home/ltao0358/pytorch/lib/python3.7/site-packages/pip/_internal/__init__.py", line 3, in <module>
+    import pip._internal.utils.inject_securetransport  # noqa
+ModuleNotFoundError: No module named 'pip._internal.utils'
