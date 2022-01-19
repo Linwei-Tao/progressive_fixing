@@ -16,6 +16,6 @@ pip install /usr/local/pytorch/cuda10.2/torchvision-0.7.0a0+3d65fc6-cp37-cp37m-l
 
 cd "/project/ContraGAN/progressive_fixing"
 pip install -r requirements.txt
-python train.py --dataset cifar10 --model resnet50 --loss cross_entropy --force_PF --PF_epoch_1=150 --PF_epoch_2=250 --decay 1e-4> pf_force_150_250.log
+python train.py --dataset cifar10 --model resnet50 --loss cross_entropy --force_PF --PF_epoch_1=150 --PF_epoch_2=250 > ./HPC/results/pf_force_150_250.log
 
 
