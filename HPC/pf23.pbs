@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -P ContraGAN
+#PBS -l select=1:ncpus=9:ngpus=1:mem=30GB
+#PBS -l walltime=10:00:00
+#PBS -j oe
+
+#Load modules
+#module load python/3.7.2 cuda/10.0.130 openmpi-gcc/3.1.3-cuda10
+module load python/3.7.7 magma/2.5.3 openmpi-gcc/3.1.5
+
+virtualenv --system-site-packages ~/pytorch
+source ~/pytorch/bin/activate
+
+pip install /usr/local/pytorch/cuda10.2/torch-1.6.0a0+f41742f-cp37-cp37m-linux_x86_64.whl
+pip install /usr/local/pytorch/cuda10.2/torchvision-0.7.0a0+3d65fc6-cp37-cp37m-linux_x86_64.whl
+
+cd "/project/ContraGAN/progressive_fixing"
+pip install -r requirements.txt
+python train.py --dataset cifar10 --model resnet50 --loss cross_entropy --PF_patience 23 > ./HPC/results/pf23.log
+
+
