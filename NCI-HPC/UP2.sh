@@ -21,4 +21,4 @@ module load python3/3.7.4
 module load pytorch/1.9.0
 cd /scratch/$PROJECT/$USER/$projectDIR
 pip install -r requirements.txt
-python3 train.py --dataset=$dataset --model=$modelname --loss=$loss --PF_criterion=$PF_criterion --UP_alpha=$alpha >/scratch/$PROJECT/$USER/progressive_fixing/job_logs/$filename.log
+python3 train.py --dataset=$dataset --model=$modelname --loss=$loss --PF_criterion=$PF_criterion --UP_alpha=$alpha >/scratch/$PROJECT/$USER/progressive_fixing/NCI-HPC/logs/$filename.log
