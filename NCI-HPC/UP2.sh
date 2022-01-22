@@ -18,7 +18,7 @@ PF_criterion="UP"
 alpha=2
 projectDIR="progressive_fixing"
 
-module load python3/3.7.4
+module load python3/3.9.2
 module load pytorch/1.9.0
 cd /scratch/$PROJECT/$USER/$projectDIR
 pip install -r requirements.txt
