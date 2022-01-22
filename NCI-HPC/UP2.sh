@@ -3,6 +3,7 @@
 #PBS -l ncpus=12
 #PBS -l mem=30GB
 #PBS -l jobfs=200GB
+#PBS -l ngpus=1
 #PBS -q gpuvolta
 #PBS -P li96
 #PBS -l walltime=10:00:00
