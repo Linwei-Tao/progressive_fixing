@@ -21,5 +21,5 @@ projectDIR="progressive_fixing"
 module load python3/3.9.2
 
 cd /scratch/$PROJECT/$USER/$projectDIR
-pip install -r requirements.txt
+pip install -r requirements-NCI.txt
 python3 train.py --dataset=$dataset --model=$modelname --loss=$loss --PF_criterion=$PF_criterion --UP_alpha=$alpha >/scratch/$PROJECT/$USER/progressive_fixing/NCI-HPC/logs/$filename.log
