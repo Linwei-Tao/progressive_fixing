@@ -1,0 +1,18 @@
+created virtual environment CPython3.7.7.final.0-64 in 4277ms
+  creator CPython3Posix(dest=/home/ltao0358/pytorch, clear=False, no_vcs_ignore=False, global=True)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/ltao0358/.local/share/virtualenv)
+    added seed packages: pip==21.3.1, setuptools==59.8.0, wheel==0.36.2, wheel==0.37.1
+  activators BashActivator,CShellActivator,FishActivator,PowerShellActivator,PythonActivator,XonshActivator
+Processing /usr/local/pytorch/cuda10.2/torch-1.6.0a0+f41742f-cp37-cp37m-linux_x86_64.whl
+Requirement already satisfied: future in /usr/local/python/3.7.7/lib/python3.7/site-packages (from torch==1.6.0a0+f41742f) (0.18.2)
+Requirement already satisfied: numpy in /usr/local/python/3.7.7/lib/python3.7/site-packages/numpy-1.18.2-py3.7-linux-x86_64.egg (from torch==1.6.0a0+f41742f) (1.18.2)
+torch is already installed with the same version as the provided wheel. Use --force-reinstall to force an installation of the wheel.
+Processing /usr/local/pytorch/cuda10.2/torchvision-0.7.0a0+3d65fc6-cp37-cp37m-linux_x86_64.whl
+Requirement already satisfied: pillow>=4.1.1 in /usr/local/python/3.7.7/lib/python3.7/site-packages (from torchvision==0.7.0a0+3d65fc6) (7.1.2)
+Requirement already satisfied: torch in /usr/local/python/3.7.7/lib/python3.7/site-packages (from torchvision==0.7.0a0+3d65fc6) (1.6.0a0+f41742f)
+Requirement already satisfied: numpy in /usr/local/python/3.7.7/lib/python3.7/site-packages/numpy-1.18.2-py3.7-linux-x86_64.egg (from torchvision==0.7.0a0+3d65fc6) (1.18.2)
+Requirement already satisfied: future in /usr/local/python/3.7.7/lib/python3.7/site-packages (from torch->torchvision==0.7.0a0+3d65fc6) (0.18.2)
+torchvision is already installed with the same version as the provided wheel. Use --force-reinstall to force an installation of the wheel.
+Processing /tmp/build/80754af9/joblib_1635411271373/work
+ERROR: Could not install packages due to an OSError: [Errno 2] No such file or directory: '/tmp/build/80754af9/joblib_1635411271373/work'
+
