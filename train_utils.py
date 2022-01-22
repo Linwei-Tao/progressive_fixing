@@ -10,7 +10,6 @@ from Losses.loss import cross_entropy, focal_loss, focal_loss_adaptive
 from Losses.loss import mmce, mmce_weighted
 from Losses.loss import brier_score
 
-
 loss_function_dict = {
     'cross_entropy': cross_entropy,
     'focal_loss': focal_loss,
@@ -45,7 +44,8 @@ def train_single_epoch(epoch,
 
         logits = model(data)
         if ('mmce' in loss_function):
-            loss = (len(data) * loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device))
+            loss = (len(data) * loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda,
+                                                                  device=device))
         else:
             loss = loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device)
 
@@ -64,9 +64,7 @@ def train_single_epoch(epoch,
         #         100. * batch_idx / len(train_loader),
         #         loss.item()))
 
-
     return train_loss / num_samples
-
 
 
 def test_single_epoch(epoch,
@@ -89,9 +87,11 @@ def test_single_epoch(epoch,
 
             logits = model(data)
             if ('mmce' in loss_function):
-                loss += (len(data) * loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device).item())
+                loss += (len(data) * loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda,
+                                                                       device=device).item())
             else:
-                loss += loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device).item()
+                loss += loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda,
+                                                          device=device).item()
             num_samples += len(data)
 
     return loss / num_samples
@@ -100,11 +100,63 @@ def test_single_epoch(epoch,
 def PF_fix(model, PF_round, epoch):
     PF_round = PF_round + 1
     print(f"PF_fix round {PF_round}")
-    model.fixAt.append(epoch)
+    model.PF_epochs.append(epoch)
 
     for i in range(PF_round):
-        print(f'fix {model.blocks_name[-(i+1)]} parameters')
-        for param in getattr(model, model.blocks_name[-(i+1)]).parameters():
+        print(f'fix {model.blocks_name[-(i + 1)]} parameters')
+        for param in getattr(model, model.blocks_name[-(i + 1)]).parameters():
             param.requires_grad = False
-
     return PF_round
+
+
+class ProgressiveFixer:
+    def __init__(self):
+        self.PF_round = 0
+        self.patience_steps = 0
+
+    def fix(self, args, model, epoch, training_set_loss, val_set_loss, val_set_ece):
+        training_set_loss = list(training_set_loss.values())
+        val_set_loss = list(val_set_loss.values())
+        val_set_ece = list(val_set_ece.values())
+
+        if args.PF_criterion == "patience":
+            if val_set_loss[-1] < min(val_set_loss):
+                self.patience_steps = 0
+
+            if val_set_loss[-1] > min(val_set_loss):
+                self.patience_steps += 1
+
+            if self.patience_steps >= args.PF_patience and self.PF_round <= 2:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)
+
+        elif args.PF_criterion == "force":
+            if epoch + 1 == args.PF_epoch_1:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)
+            if epoch + 1 == args.PF_epoch_2:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)
+
+        elif args.PF_criterion == "GL":
+            self.GL = 100 * (val_set_loss[-1] / min(val_set_loss) - 1)
+            if self.GL > args.GL_alpha and self.PF_round <= 2:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)
+        elif args.PF_criterion == "PQ":
+            k = 5
+            if len(training_set_loss) < k:
+                return
+            self.GL = 100 * (val_set_loss[-1] / min(val_set_loss) - 1)
+            self.P_k = 1000 * (sum(training_set_loss[-k:]) / (k * min(training_set_loss[-k:])) - 1)
+            self.PQ = self.GL / self.P_k
+            if self.PQ > args.PQ_alpha and self.PF_round <= 2:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)
+        elif args.PF_criterion == "UP":
+            UP = 0
+            k = 5
+            if args.UP_alpha * k + 1 > len(val_set_loss):
+                return
+            for i in range(args.UP_alpha):
+                if val_set_loss[-1 - i * k] > val_set_loss[-1 - (i + 1) * k]:
+                    UP += 1
+                else:
+                    break
+            if UP >= args.UP_alpha and self.PF_round <= 2:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)

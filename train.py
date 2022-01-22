@@ -29,10 +29,10 @@ from Losses.loss import mmce, mmce_weighted
 from Losses.loss import brier_score
 
 # Import train and validation utilities
-from train_utils import train_single_epoch, test_single_epoch, PF_fix
+from train_utils import train_single_epoch, test_single_epoch, PF_fix, ProgressiveFixer
 
 # Import validation metrics
-from Metrics.metrics import test_classification_net
+from Metrics.metrics import test_classification_net, expected_calibration_error
 
 dataset_num_classes = {
     'cifar10': 10,
@@ -191,6 +191,12 @@ def parseArgs():
                         dest="PF_epoch_1", help="Patience for progressively fixing")
     parser.add_argument("--PF_epoch_2", type=int, default=PF_epoch_2,
                         dest="PF_epoch_2", help="Patience for progressively fixing")
+    parser.add_argument("--PF_criterion", type=str, default='patience', dest="PF_criterion",
+                        help='value should be in patience, force, GL, PQ, UP')
+    parser.add_argument("--GL_alpha", type=int, default=0, dest="GL_alpha", help="")
+    parser.add_argument("--PQ_alpha", type=int, default=0, dest="PQ_alpha", help="")
+    parser.add_argument("--UP_alpha", type=int, default=0, dest="UP_alpha", help="")
+
 
     return parser.parse_args()
 
@@ -203,23 +209,45 @@ if __name__ == "__main__":
         random.seed(seed)
         torch.backends.cudnn.deterministic = True
 
+
     setup_seed(20)
     args = parseArgs()
 
-    if args.PF_patience:
+    if args.PF_criterion == "patience":
         run_name = f'{args.model_name}_' \
                    f'{args.dataset}_' \
                    f'{args.loss_function}_' \
                    f'PF={args.PF_patience}_' \
                    f'WD={args.weight_decay}_' \
                    f'{datetime.now().strftime("%y%m%d%H%M%S")}'
-    elif args.force_PF:
+    elif args.PF_criterion == "force":
         run_name = f'{args.model_name}_' \
                    f'{args.dataset}_' \
                    f'{args.loss_function}_' \
                    f'PF_1={args.PF_epoch_1}_' \
                    f'PF_2={args.PF_epoch_2}_' \
                    f'WD={args.weight_decay}_' \
+                   f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+    elif args.PF_criterion == "GL":
+        run_name = f'{args.model_name}_' \
+                   f'{args.dataset}_' \
+                   f'{args.loss_function}_' \
+                   f'GL{args.GL_alpha}_' \
+                   f'WD{args.weight_decay}_' \
+                   f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+    elif args.PF_criterion == "PQ":
+        run_name = f'{args.model_name}_' \
+                   f'{args.dataset}_' \
+                   f'{args.loss_function}_' \
+                   f'PQ{args.PQ_alpha}_' \
+                   f'WD{args.weight_decay}_' \
+                   f'{datetime.now().strftime("%y%m%d%H%M%S")}'
+    elif args.PF_criterion == "UP":
+        run_name = f'{args.model_name}_' \
+                   f'{args.dataset}_' \
+                   f'{args.loss_function}_' \
+                   f'UP{args.UP_alpha}_' \
+                   f'WD{args.weight_decay}_' \
                    f'{datetime.now().strftime("%y%m%d%H%M%S")}'
     else:
         run_name = f'{args.model_name}_' \
@@ -275,7 +303,7 @@ if __name__ == "__main__":
                                weight_decay=args.weight_decay)
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[args.first_milestone, args.second_milestone],
                                                gamma=0.1)
-
+    progressiveFixer = ProgressiveFixer()
     if (args.dataset == 'tiny_imagenet'):
         train_loader = dataset_loader[args.dataset].get_data_loader(
             root=args.dataset_root,
@@ -312,6 +340,8 @@ if __name__ == "__main__":
     test_set_loss = {}
     val_set_err = {}
     val_set_ece = {}
+    test_set_err = {}
+    test_set_ece = {}
 
     for epoch in range(0, start_epoch):
         scheduler.step()
@@ -358,35 +388,30 @@ if __name__ == "__main__":
 
         scheduler.step()
 
-        _, val_acc, _, _, _, ece = test_classification_net(model, val_loader, device)
+        val_conf_matrix, val_acc, val_labels, val_predictions, val_confidences = test_classification_net(model,
+                                                                                                         val_loader,
+                                                                                                         device)
+        test_conf_matrix, test_acc, test_labels, test_predictions, test_confidences = test_classification_net(model,
+                                                                                                              test_loader,
+                                                                                                              device)
+        val_ece = expected_calibration_error(val_confidences, val_predictions, val_labels, num_bins=15)
+        test_ece = expected_calibration_error(test_confidences, test_predictions, test_labels, num_bins=15)
 
         print(
-            '====> Epoch: {} Training loss: {:.4f}  Val set loss: {:.4f} Val set acc: {:.4f} Val ECE: {:.4f}'.format(epoch, train_loss,
-                                                                                                     val_loss, val_acc, ece))
+            '====> Epoch: {} Train loss: {:.4f}  Val  loss: {:.4f} Val acc: {:.4f} Val ECE: {:.4f} Test acc: {:.4f} Test ECE: {:.4f}'.format(
+                epoch, train_loss,
+                val_loss, val_acc, val_ece, test_acc, test_ece))
 
         training_set_loss[epoch] = train_loss
         val_set_loss[epoch] = val_loss
         test_set_loss[epoch] = test_loss
         val_set_err[epoch] = 1 - val_acc
-        val_set_ece[epoch] = ece
+        val_set_ece[epoch] = val_ece
+        test_set_err[epoch] = 1 - test_acc
+        test_set_ece[epoch] = test_ece
 
-        if args.PF_patience:
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
-                PF_steps = 0
+        progressiveFixer.fix(args, model, epoch, training_set_loss, val_set_loss, val_set_ece)
 
-            if val_loss > best_val_loss:
-                PF_steps += 1
-
-            if PF_steps >= args.PF_patience and PF_round <= 3:
-                if args.PF_patience != 0:
-                    PF_round = PF_fix(model, PF_round, epoch)
-                    best_val_loss = np.inf
-        if args.force_PF:
-            if epoch + 1 == args.PF_epoch_1:
-                PF_round = PF_fix(model, PF_round, epoch)
-            if epoch + 1 == args.PF_epoch_2:
-                PF_round = PF_fix(model, PF_round, epoch)
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             model.best_epoch = epoch + 1
@@ -414,3 +439,9 @@ if __name__ == "__main__":
 
     with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_val_ece.json'), 'a') as ft:
         json.dump(val_set_ece, ft)
+
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_test_error.json'), 'a') as ft:
+        json.dump(test_set_err, ft)
+
+    with open(os.path.join(args.save_loc, save_name[:save_name.rfind('_')] + '_test_ece.json'), 'a') as ft:
+        json.dump(test_set_ece, ft)
