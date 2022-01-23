@@ -103,8 +103,9 @@ def parseArgs():
     second_milestone = 250  # Milestone for change in lr
     gamma_schedule_step1 = 100
     gamma_schedule_step2 = 250
-    PF_epoch_1 = 46
-    PF_epoch_2 = 139
+    PF_epoch_1 = None
+    PF_epoch_2 = None
+    PF_epoch_3 = None
 
     # PF
     PF_patience = None  # 0 for no progressively fixing
@@ -191,6 +192,8 @@ def parseArgs():
                         dest="PF_epoch_1", help="Patience for progressively fixing")
     parser.add_argument("--PF_epoch_2", type=int, default=PF_epoch_2,
                         dest="PF_epoch_2", help="Patience for progressively fixing")
+    parser.add_argument("--PF_epoch_3", type=int, default=PF_epoch_3,
+                        dest="PF_epoch_3", help="Patience for progressively fixing")
     parser.add_argument("--PF_criterion", type=str, default='patience', dest="PF_criterion",
                         help='value should be in patience, force, GL, PQ, UP')
     parser.add_argument("--GL_alpha", type=int, default=0, dest="GL_alpha", help="")
@@ -226,6 +229,7 @@ if __name__ == "__main__":
                    f'{args.loss_function}_' \
                    f'PF_1={args.PF_epoch_1}_' \
                    f'PF_2={args.PF_epoch_2}_' \
+                   f'PF_3={args.PF_epoch_3}_' \
                    f'WD={args.weight_decay}_' \
                    f'{datetime.now().strftime("%y%m%d%H%M%S")}'
     elif args.PF_criterion == "GL":

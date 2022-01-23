@@ -130,9 +130,11 @@ class ProgressiveFixer:
                 self.PF_round = PF_fix(model, self.PF_round, epoch)
 
         elif args.PF_criterion == "force":
-            if epoch + 1 == args.PF_epoch_1:
+            if args.PF_epoch_1 and epoch + 1 == args.PF_epoch_1:
                 self.PF_round = PF_fix(model, self.PF_round, epoch)
-            if epoch + 1 == args.PF_epoch_2:
+            if args.PF_epoch_2 and epoch + 1 == args.PF_epoch_2:
+                self.PF_round = PF_fix(model, self.PF_round, epoch)
+            if args.PF_epoch_3 and epoch + 1 == args.PF_epoch_3:
                 self.PF_round = PF_fix(model, self.PF_round, epoch)
 
         elif args.PF_criterion == "GL":
