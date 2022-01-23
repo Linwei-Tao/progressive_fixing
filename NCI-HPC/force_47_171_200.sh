@@ -10,14 +10,14 @@
 #PBS -l storage=gdata/li96+scratch/li96
 #PBS -l wd
 
-filename="force_47_171_172"
+filename="force_47_171_200"
 modelname="resnet50"
 dataset="cifar10"
 loss="cross_entropy"
 PF_criterion="force"
 PF_epoch_1=47
 PF_epoch_2=171
-PF_epoch_3=172
+PF_epoch_3=200
 projectDIR="progressive_fixing"
 
 module load python3/3.9.2
