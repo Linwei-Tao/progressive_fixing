@@ -402,7 +402,7 @@ if __name__ == "__main__":
         test_ece = expected_calibration_error(test_confidences, test_predictions, test_labels, num_bins=15)
 
         print(
-            '====> Epoch: {} Train loss: {:.4f}  Val  loss: {:.4f} Val acc: {:.4f} Val ECE: {:.4f} Test acc: {:.4f} Test ECE: {:.4f}'.format(
+            '====> Epoch: {} Train loss: {:.4f}  Val loss: {:.4f} Val acc: {:.4f} Val ECE: {:.4f} Test acc: {:.4f} Test ECE: {:.4f}'.format(
                 epoch, train_loss,
                 val_loss, val_acc, val_ece, test_acc, test_ece))
 
