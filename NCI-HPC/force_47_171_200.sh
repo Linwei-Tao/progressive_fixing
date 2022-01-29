@@ -23,4 +23,4 @@ projectDIR="progressive_fixing"
 module load python3/3.9.2
 module load pytorch/1.9.0
 cd /scratch/$PROJECT/$USER/$projectDIR
-python3 train.py --dataset=$dataset --model=$modelname --loss=$loss --PF_criterion=$PF_criterion --PF_epoch_1=$PF_epoch_1 --PF_epoch_2=$PF_epoch_2 --PF_epoch_3=$PF_epoch_3 >/scratch/$PROJECT/$USER/progressive_fixing/NCI-HPC/logs/$filename.log
+python3 train.py --dataset=$dataset --model=$modelname --loss=$loss --PF_criterion=$PF_criterion --PF_epoch_1=$PF_epoch_1 --PF_epoch_2=$PF_epoch_2 --PF_epoch_3=$PF_epoch_3 --save-interval=1>/scratch/$PROJECT/$USER/progressive_fixing/NCI-HPC/logs/$filename.log
